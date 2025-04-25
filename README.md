@@ -1,4 +1,4 @@
-#Step of run Project
+# Step of run Project
 
 ```bash
 git clone https://github.com/phaewwrd/crypto_api.git
@@ -7,7 +7,7 @@ git clone https://github.com/phaewwrd/crypto_api.git
 cd crypto_api
 npm install
 ```
-#Create .env file
+# Create .env file
 ```js
 DATABASE_URL="mysql://root:your_password@localhost:3306/crypto_db"
 JWT_SECRET="xxxxx"
