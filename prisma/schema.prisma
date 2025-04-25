@@ -1,0 +1,67 @@
+// 📁 src/prisma/schema.prisma
+// Prisma schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  name           String
+  email          String        @unique
+  password_hash  String
+  created_at     DateTime      @default(now())
+  fiatWallets    FiatWallet[]
+  cryptoWallets  CryptoWallet[]
+  tradeOrders    TradeOrder[]
+  transactions   Transaction[] @relation("UserTransactionFrom")
+  receivedTxs    Transaction[] @relation("UserTransactionTo")
+}
+
+model FiatWallet {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  currency  String   // THB or USD
+  balance   Float
+}
+
+model CryptoWallet {
+  id       Int     @id @default(autoincrement())
+  user     User    @relation(fields: [userId], references: [id])
+  userId   Int
+  coin     String  // BTC, ETH, XRP, DOGE
+  balance  Float
+}
+
+model TradeOrder {
+  id             Int      @id @default(autoincrement())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int
+  type           String   // buy or sell
+  coin           String
+  amount         Float
+  price_per_unit Float
+  status         String   // open, completed, cancelled
+  created_at     DateTime @default(now())
+}
+
+model Transaction {
+  id              Int      @id @default(autoincrement())
+  from_user       User?    @relation("UserTransactionFrom", fields: [fromUserId], references: [id])
+  fromUserId      Int?
+  to_user         User?    @relation("UserTransactionTo", fields: [toUserId], references: [id])
+  toUserId        Int?
+  externalAddress String?
+  type            String   // fiat_transfer, crypto_transfer, trade
+  coin            String?
+  fiat_currency   String?
+  amount          Float
+  status          String
+  created_at      DateTime @default(now())
+}
